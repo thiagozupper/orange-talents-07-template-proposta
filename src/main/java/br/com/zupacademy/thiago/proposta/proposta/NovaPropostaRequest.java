@@ -37,8 +37,8 @@ public class NovaPropostaRequest {
         this.salario = salario;
     }
 
-    public Proposta toProposta() {
-        return new Proposta(documento, email, nome, endereco, salario);
+    public Proposta toProposta(StatusProposta status) {
+        return new Proposta(documento, email, nome, endereco, salario, status);
     }
 
     public String getDocumento() {

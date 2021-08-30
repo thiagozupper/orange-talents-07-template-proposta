@@ -1,13 +1,11 @@
 package br.com.zupacademy.thiago.proposta.proposta;
 
+import br.com.zupacademy.thiago.proposta.feing.analise.AnaliseRequest;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -22,18 +20,24 @@ public class Proposta {
     private String nome;
     private String endereco;
     private BigDecimal salario;
+    private int status;
 
     private Proposta() {
     }
 
-    public Proposta(@NotBlank String documento, @NotBlank @Email String email,
-                    @NotBlank String nome, @NotBlank String endereco,
-                    @NotNull @Positive BigDecimal salario) {
+    public Proposta(String documento, String email,
+                    String nome, String endereco,
+                    BigDecimal salario, StatusProposta status) {
         this.documento = documento;
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
         this.salario = salario;
+        this.status = status.getCodigo();
+    }
+
+    public void setStatus(StatusProposta status) {
+        this.status = status.getCodigo();
     }
 
     @Override
@@ -51,5 +55,9 @@ public class Proposta {
 
     public Long getId() {
         return this.id;
+    }
+
+    public AnaliseRequest toAnaliseRequest() {
+        return new AnaliseRequest(this.documento, this.nome, this.id.toString());
     }
 }
