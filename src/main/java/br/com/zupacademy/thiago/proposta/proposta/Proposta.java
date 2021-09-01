@@ -1,6 +1,7 @@
 package br.com.zupacademy.thiago.proposta.proposta;
 
 import br.com.zupacademy.thiago.proposta.feing.analise.AnaliseRequest;
+import br.com.zupacademy.thiago.proposta.feing.contas.CartaoResponse;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ public class Proposta {
     private String endereco;
     private BigDecimal salario;
     private int status;
+    private String numeroCartao;
 
     private Proposta() {
     }
@@ -59,5 +61,9 @@ public class Proposta {
 
     public AnaliseRequest toAnaliseRequest() {
         return new AnaliseRequest(this.documento, this.nome, this.id.toString());
+    }
+
+    public void associarNumeroCartao(CartaoResponse cartao) {
+        this.numeroCartao = cartao.getId();
     }
 }
