@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/propostas")
@@ -55,4 +56,15 @@ public class PropostaController {
 
         return ResponseEntity.ok().location(uri).build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        Optional<Proposta> optionalProposta = propostaRepository.findById(id);
+        if (optionalProposta.isPresent()) {
+            Proposta proposta = optionalProposta.get();
+            return ResponseEntity.ok(proposta.detalharProposta());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 }
