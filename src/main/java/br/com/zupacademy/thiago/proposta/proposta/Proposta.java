@@ -66,4 +66,9 @@ public class Proposta {
     public void associarNumeroCartao(CartaoResponse cartao) {
         this.numeroCartao = cartao.getId();
     }
+
+    public PropostaDetalhe detalharProposta() {
+        return new PropostaDetalhe(this.documento, this.nome, this.email, this.endereco, this.salario,
+                StatusProposta.toEnum(this.status), this.numeroCartao);
+    }
 }
