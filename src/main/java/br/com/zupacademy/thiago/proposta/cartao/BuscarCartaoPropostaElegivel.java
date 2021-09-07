@@ -1,5 +1,6 @@
-package br.com.zupacademy.thiago.proposta.feing.contas;
+package br.com.zupacademy.thiago.proposta.cartao;
 
+import br.com.zupacademy.thiago.proposta.feing.contas.ContasClient;
 import br.com.zupacademy.thiago.proposta.proposta.Proposta;
 import br.com.zupacademy.thiago.proposta.proposta.PropostaRepository;
 import br.com.zupacademy.thiago.proposta.proposta.StatusProposta;
@@ -22,12 +23,14 @@ public class BuscarCartaoPropostaElegivel {
 
     private final TransactionTemplate tx;
     private final PropostaRepository propostaRepository;
+    private final CartaoRepository cartaoRepository;
     private final ContasClient contasClient;
 
     public BuscarCartaoPropostaElegivel(TransactionTemplate tx, PropostaRepository propostaRepository,
-                                        ContasClient contasClient) {
+                                        CartaoRepository cartaoRepository, ContasClient contasClient) {
         this.tx = tx;
         this.propostaRepository = propostaRepository;
+        this.cartaoRepository = cartaoRepository;
         this.contasClient = contasClient;
     }
 
@@ -39,9 +42,13 @@ public class BuscarCartaoPropostaElegivel {
 
         for (Proposta proposta : propostas) {
             try {
-                CartaoResponse cartao = contasClient.findCartaoByIdProposta(proposta.getId().toString());
-                proposta.associarNumeroCartao(cartao);
-                tx.executeWithoutResult(status -> propostaRepository.save(proposta));
+                CartaoResponse cartaoResponse = contasClient.findCartaoByIdProposta(proposta.getId().toString());
+                proposta.associarNumeroCartao(cartaoResponse);
+                Cartao cartao = cartaoResponse.toCartao();
+                tx.executeWithoutResult(status -> {
+                    propostaRepository.save(proposta);
+                    cartaoRepository.save(cartao);
+                });
             } catch(FeignException ex) {
                 logger.info("Falha ao buscar cartão da proposta de id " + proposta.getId());
             }

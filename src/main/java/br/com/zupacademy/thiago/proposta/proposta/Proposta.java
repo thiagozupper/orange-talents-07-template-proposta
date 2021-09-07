@@ -1,7 +1,7 @@
 package br.com.zupacademy.thiago.proposta.proposta;
 
 import br.com.zupacademy.thiago.proposta.feing.analise.AnaliseRequest;
-import br.com.zupacademy.thiago.proposta.feing.contas.CartaoResponse;
+import br.com.zupacademy.thiago.proposta.cartao.CartaoResponse;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

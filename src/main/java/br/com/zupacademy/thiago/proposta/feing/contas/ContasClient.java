@@ -1,5 +1,6 @@
 package br.com.zupacademy.thiago.proposta.feing.contas;
 
+import br.com.zupacademy.thiago.proposta.cartao.CartaoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
