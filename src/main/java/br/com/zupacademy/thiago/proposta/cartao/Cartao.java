@@ -15,6 +15,7 @@ public class Cartao {
     private String titular;
     private BigDecimal limite;
     private Long idProposta;
+    private int status;
 
     public Cartao() {
     }
@@ -26,6 +27,7 @@ public class Cartao {
         this.titular = titular;
         this.limite = limite;
         this.idProposta = idProposta;
+        this.status = StatusCartao.ATIVO.getCodigo();
     }
 
     @Override
@@ -39,5 +41,13 @@ public class Cartao {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public boolean isBloqueado() {
+        return this.status == StatusCartao.BLOQUEADO.getCodigo();
+    }
+
+    public void bloquear() {
+        this.status = StatusCartao.BLOQUEADO.getCodigo();
     }
 }

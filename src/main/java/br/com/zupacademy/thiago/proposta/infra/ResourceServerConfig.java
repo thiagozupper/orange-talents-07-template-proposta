@@ -22,7 +22,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                     authorizeRequests
                         .antMatchers(HttpMethod.POST, "/api/propostas/**").hasAuthority("SCOPE_proposta")
                         .antMatchers(HttpMethod.GET, "/api/propostas/**").hasAuthority("SCOPE_proposta")
-                        .antMatchers(HttpMethod.POST, "/api/propostas/**").hasAuthority("SCOPE_proposta")
+                        .antMatchers(HttpMethod.GET, "/api/cartoes/**").hasAuthority("SCOPE_proposta")
                         .anyRequest().authenticated()
                         .and().csrf().disable()
                         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
