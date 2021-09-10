@@ -31,14 +31,15 @@ public class CartaoController {
         }
 
         Cartao cartao = optionalCartao.get();
-        if (cartao.isBloqueado()) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Cartão já está bloqueado");
+        if (cartao.isBloqueadoOuBloqueioSolicitado()) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("Cartão já está em situação de bloqueio");
         }
 
         Bloqueio bloqueio = new Bloqueio(ipCliente, userAgent, cartao);
         bloqueioRepository.save(bloqueio);
 
-        cartao.bloquear();
+        cartao.bloqueioSolicitado();
         cartaoRepository.save(cartao);
 
         return ResponseEntity.ok().build();

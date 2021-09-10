@@ -43,11 +43,20 @@ public class Cartao {
         return Objects.hash(id);
     }
 
-    public boolean isBloqueado() {
-        return this.status == StatusCartao.BLOQUEADO.getCodigo();
+    public boolean isBloqueadoOuBloqueioSolicitado() {
+        return this.status == StatusCartao.BLOQUEADO.getCodigo() ||
+                this.status == StatusCartao.BLOQUEIO_SOLICITADO.getCodigo();
     }
 
     public void bloquear() {
         this.status = StatusCartao.BLOQUEADO.getCodigo();
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void bloqueioSolicitado() {
+        this.status = StatusCartao.BLOQUEIO_SOLICITADO.getCodigo();
     }
 }

@@ -34,7 +34,7 @@ public class BuscarCartaoPropostaElegivel {
         this.contasClient = contasClient;
     }
 
-    @Scheduled(fixedDelay = 30 * SEGUNDO)
+    @Scheduled(fixedDelay = 10 * SEGUNDO)
     public void associarCartaoPropostaElegivel() {
 
         List<Proposta> propostas = propostaRepository

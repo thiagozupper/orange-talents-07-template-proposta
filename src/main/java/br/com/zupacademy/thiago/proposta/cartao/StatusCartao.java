@@ -1,8 +1,9 @@
 package br.com.zupacademy.thiago.proposta.cartao;
 
 public enum StatusCartao {
-    BLOQUEADO(0),
-    ATIVO(1);
+    ATIVO(0),
+    BLOQUEIO_SOLICITADO(1),
+    BLOQUEADO(2);
 
     private int codigo;
 
