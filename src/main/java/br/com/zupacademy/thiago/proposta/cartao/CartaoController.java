@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -13,10 +14,12 @@ public class CartaoController {
 
     private final BloqueioRepository bloqueioRepository;
     private final CartaoRepository cartaoRepository;
+    private final AvisoViagemRepository avisoViagemRepository;
 
-    public CartaoController(BloqueioRepository bloqueioRepository, CartaoRepository cartaoRepository) {
+    public CartaoController(BloqueioRepository bloqueioRepository, CartaoRepository cartaoRepository, AvisoViagemRepository avisoViagemRepository) {
         this.bloqueioRepository = bloqueioRepository;
         this.cartaoRepository = cartaoRepository;
+        this.avisoViagemRepository = avisoViagemRepository;
     }
 
     @GetMapping("{idCartao}/bloqueio")
@@ -42,6 +45,24 @@ public class CartaoController {
         cartao.bloqueioSolicitado();
         cartaoRepository.save(cartao);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("{idCartao}/aviso-viagem")
+    @Transactional
+    public ResponseEntity<?> avisoViagem(@PathVariable String idCartao,
+            @RequestHeader("User-Agent") String userAgent,
+            @RequestHeader("X-Forwarded-For") String ipCliente,
+            @RequestBody @Valid AvisoViagemRequest avisoViagemRequest) {
+
+        Optional<Cartao> optionalCartao = cartaoRepository.findById(idCartao);
+        if (optionalCartao.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cartão não encontrado");
+        }
+
+        Cartao cartao = optionalCartao.get();
+        AvisoViagem avisoViagem = avisoViagemRequest.toAvisoViagem(ipCliente, userAgent, cartao);
+        avisoViagemRepository.save(avisoViagem);
         return ResponseEntity.ok().build();
     }
 }
