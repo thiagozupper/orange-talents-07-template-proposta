@@ -23,4 +23,12 @@ public class AvisoViagemRequest {
         return new AvisoViagem(this.destino, this.dataTerminoViagem,
                 ipCliente, userAgente, cartao);
     }
+
+    public String getDestino() {
+        return this.destino;
+    }
+
+    public LocalDate getDataTerminoViagem() {
+        return dataTerminoViagem;
+    }
 }

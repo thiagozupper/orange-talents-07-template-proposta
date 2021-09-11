@@ -1,7 +1,11 @@
 package br.com.zupacademy.thiago.proposta.cartao;
 
+import br.com.zupacademy.thiago.proposta.feing.contas.ContasClient;
+import feign.FeignException;
+import org.jboss.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -12,14 +16,22 @@ import java.util.Optional;
 @RequestMapping("/api/cartoes")
 public class CartaoController {
 
+    Logger logger = Logger.getLogger(CartaoController.class);
+
+    private final TransactionTemplate tx;
     private final BloqueioRepository bloqueioRepository;
     private final CartaoRepository cartaoRepository;
     private final AvisoViagemRepository avisoViagemRepository;
+    private final ContasClient contasClient;
 
-    public CartaoController(BloqueioRepository bloqueioRepository, CartaoRepository cartaoRepository, AvisoViagemRepository avisoViagemRepository) {
+    public CartaoController(TransactionTemplate tx, BloqueioRepository bloqueioRepository,
+                            CartaoRepository cartaoRepository, AvisoViagemRepository avisoViagemRepository,
+                            ContasClient contasClient) {
+        this.tx = tx;
         this.bloqueioRepository = bloqueioRepository;
         this.cartaoRepository = cartaoRepository;
         this.avisoViagemRepository = avisoViagemRepository;
+        this.contasClient = contasClient;
     }
 
     @GetMapping("{idCartao}/bloqueio")
@@ -49,7 +61,6 @@ public class CartaoController {
     }
 
     @PostMapping("{idCartao}/aviso-viagem")
-    @Transactional
     public ResponseEntity<?> avisoViagem(@PathVariable String idCartao,
             @RequestHeader("User-Agent") String userAgent,
             @RequestHeader("X-Forwarded-For") String ipCliente,
@@ -61,8 +72,16 @@ public class CartaoController {
         }
 
         Cartao cartao = optionalCartao.get();
-        AvisoViagem avisoViagem = avisoViagemRequest.toAvisoViagem(ipCliente, userAgent, cartao);
-        avisoViagemRepository.save(avisoViagem);
+
+        try {
+            contasClient.notificaAvisoViagem(new NotificaAvisoViagemRequest(avisoViagemRequest), cartao.getId());
+            AvisoViagem avisoViagem = avisoViagemRequest.toAvisoViagem(ipCliente, userAgent, cartao);
+            tx.executeWithoutResult(status -> avisoViagemRepository.save(avisoViagem));
+        } catch (FeignException ex) {
+            logger.info("Falha ao notificar aviso de viagem: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falha ao criar aviso de viagem");
+        }
+
         return ResponseEntity.ok().build();
     }
 }
