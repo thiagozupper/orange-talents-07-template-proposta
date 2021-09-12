@@ -1,4 +1,4 @@
-package br.com.zupacademy.thiago.proposta.cartao;
+package br.com.zupacademy.thiago.proposta.cartao.bloqueio;
 
 import org.springframework.data.repository.CrudRepository;
 

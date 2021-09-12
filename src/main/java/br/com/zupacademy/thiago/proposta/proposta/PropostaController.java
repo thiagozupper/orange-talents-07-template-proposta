@@ -54,7 +54,7 @@ public class PropostaController {
         URI uri = uriBuilder.path("/api/propostas/{id}")
                     .buildAndExpand(proposta.getId()).toUri();
 
-        return ResponseEntity.ok().location(uri).build();
+        return ResponseEntity.created(uri).build();
     }
 
     @GetMapping("/{id}")

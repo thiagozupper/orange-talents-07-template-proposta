@@ -1,6 +1,6 @@
-package br.com.zupacademy.thiago.proposta.cartao;
+package br.com.zupacademy.thiago.proposta.cartao.avisoviagem;
 
-public class BloqueioCartaoResponse {
+public class NotificaAvisoViagemResponse {
 
     private String resultado;
 
@@ -11,5 +11,4 @@ public class BloqueioCartaoResponse {
     public void setResultado(String resultado) {
         this.resultado = resultado;
     }
-
 }

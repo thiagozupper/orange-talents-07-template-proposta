@@ -1,4 +1,6 @@
-package br.com.zupacademy.thiago.proposta.cartao;
+package br.com.zupacademy.thiago.proposta.cartao.bloqueio;
+
+import br.com.zupacademy.thiago.proposta.cartao.Cartao;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

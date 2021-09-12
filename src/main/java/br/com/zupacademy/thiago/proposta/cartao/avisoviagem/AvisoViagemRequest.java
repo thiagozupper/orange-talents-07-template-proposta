@@ -1,4 +1,6 @@
-package br.com.zupacademy.thiago.proposta.cartao;
+package br.com.zupacademy.thiago.proposta.cartao.avisoviagem;
+
+import br.com.zupacademy.thiago.proposta.cartao.Cartao;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;

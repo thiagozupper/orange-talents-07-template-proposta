@@ -1,5 +1,8 @@
-package br.com.zupacademy.thiago.proposta.cartao;
+package br.com.zupacademy.thiago.proposta.cartao.bloqueio;
 
+import br.com.zupacademy.thiago.proposta.cartao.Cartao;
+import br.com.zupacademy.thiago.proposta.cartao.CartaoRepository;
+import br.com.zupacademy.thiago.proposta.cartao.StatusCartao;
 import br.com.zupacademy.thiago.proposta.feing.contas.ContasClient;
 import feign.FeignException;
 import org.jboss.logging.Logger;
