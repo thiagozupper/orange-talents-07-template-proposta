@@ -11,9 +11,13 @@ import br.com.zupacademy.thiago.proposta.cartao.carteira.Carteira;
 import br.com.zupacademy.thiago.proposta.cartao.carteira.CarteiraRepository;
 import br.com.zupacademy.thiago.proposta.feing.contas.ContasClient;
 import feign.FeignException;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.jboss.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,23 +39,26 @@ public class CartaoController {
     private final AvisoViagemRepository avisoViagemRepository;
     private final CarteiraRepository carteiraRepository;
     private final ContasClient contasClient;
+    private final Tracer tracer;
 
     public CartaoController(TransactionTemplate tx, BloqueioRepository bloqueioRepository,
                             CartaoRepository cartaoRepository, AvisoViagemRepository avisoViagemRepository,
-                            CarteiraRepository carteiraRepository, ContasClient contasClient) {
+                            CarteiraRepository carteiraRepository, ContasClient contasClient, Tracer tracer) {
         this.tx = tx;
         this.bloqueioRepository = bloqueioRepository;
         this.cartaoRepository = cartaoRepository;
         this.avisoViagemRepository = avisoViagemRepository;
         this.carteiraRepository = carteiraRepository;
         this.contasClient = contasClient;
+        this.tracer = tracer;
     }
 
     @GetMapping("{idCartao}/bloqueio")
     @Transactional
-    public ResponseEntity<?> bloquearCartao(
-            @PathVariable String idCartao, @RequestHeader("User-Agent") String userAgent,
-                                @RequestHeader("X-Forwarded-For") String ipCliente) {
+    public ResponseEntity<?> bloquearCartao(@PathVariable String idCartao,
+                                            @RequestHeader("User-Agent") String userAgent,
+                                            @RequestHeader("X-Forwarded-For") String ipCliente,
+                                            @AuthenticationPrincipal Jwt token) {
 
         Optional<Cartao> optionalCartao = cartaoRepository.findById(idCartao);
         if (optionalCartao.isEmpty()) {
@@ -75,9 +82,12 @@ public class CartaoController {
 
     @PostMapping("{idCartao}/aviso-viagem")
     public ResponseEntity<?> avisoViagem(@PathVariable String idCartao,
-            @RequestHeader("User-Agent") String userAgent,
-            @RequestHeader("X-Forwarded-For") String ipCliente,
-            @RequestBody @Valid AvisoViagemRequest avisoViagemRequest) {
+                                         @RequestHeader("User-Agent") String userAgent,
+                                         @RequestHeader("X-Forwarded-For") String ipCliente,
+                                         @RequestBody @Valid AvisoViagemRequest avisoViagemRequest,
+                                         @AuthenticationPrincipal Jwt token) {
+
+        adicionaUsuarioLogadoOpenTracing(token);
 
         Optional<Cartao> optionalCartao = cartaoRepository.findById(idCartao);
         if (optionalCartao.isEmpty()) {
@@ -100,7 +110,11 @@ public class CartaoController {
 
     @PostMapping("{idCartao}/associar-carteira")
     public ResponseEntity<?> associarCarteira(@PathVariable String idCartao,
-                     @RequestBody @Valid AssociaNovaCarteiraRequest request, UriComponentsBuilder uriBuilder) {
+                                              @RequestBody @Valid AssociaNovaCarteiraRequest request,
+                                              @AuthenticationPrincipal Jwt token,
+                                              UriComponentsBuilder uriBuilder) {
+
+        adicionaUsuarioLogadoOpenTracing(token);
 
         Optional<Cartao> optionalCartao = cartaoRepository.findById(idCartao);
         if (optionalCartao.isEmpty()) {
@@ -126,6 +140,12 @@ public class CartaoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falha ao associar carteira");
         }
 
+    }
+
+    private void adicionaUsuarioLogadoOpenTracing(Jwt token) {
+        String emailUsuarioLogado = token.getClaimAsString("email");
+        Span span = tracer.activeSpan();
+        span.setBaggageItem("user.email", emailUsuarioLogado);
     }
 
 }

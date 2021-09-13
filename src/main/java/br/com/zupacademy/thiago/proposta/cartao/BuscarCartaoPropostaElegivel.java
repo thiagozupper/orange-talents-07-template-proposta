@@ -5,6 +5,7 @@ import br.com.zupacademy.thiago.proposta.proposta.Proposta;
 import br.com.zupacademy.thiago.proposta.proposta.PropostaRepository;
 import br.com.zupacademy.thiago.proposta.proposta.StatusProposta;
 import feign.FeignException;
+import io.opentracing.Tracer;
 import org.jboss.logging.Logger;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,16 +26,18 @@ public class BuscarCartaoPropostaElegivel {
     private final PropostaRepository propostaRepository;
     private final CartaoRepository cartaoRepository;
     private final ContasClient contasClient;
+    private final Tracer tracer;
 
     public BuscarCartaoPropostaElegivel(TransactionTemplate tx, PropostaRepository propostaRepository,
-                                        CartaoRepository cartaoRepository, ContasClient contasClient) {
+                                        CartaoRepository cartaoRepository, ContasClient contasClient, Tracer tracer) {
         this.tx = tx;
         this.propostaRepository = propostaRepository;
         this.cartaoRepository = cartaoRepository;
         this.contasClient = contasClient;
+        this.tracer = tracer;
     }
 
-    @Scheduled(fixedDelay = 10 * SEGUNDO)
+    @Scheduled(fixedDelay = 60 * SEGUNDO)
     public void associarCartaoPropostaElegivel() {
 
         List<Proposta> propostas = propostaRepository
@@ -42,7 +45,9 @@ public class BuscarCartaoPropostaElegivel {
 
         for (Proposta proposta : propostas) {
             try {
-                CartaoResponse cartaoResponse = contasClient.findCartaoByIdProposta(proposta.getId().toString());
+                String idProposta = proposta.getId().toString();
+                logarTentativaOpenTracing(idProposta);
+                CartaoResponse cartaoResponse = contasClient.findCartaoByIdProposta(idProposta);
                 proposta.associarNumeroCartao(cartaoResponse);
                 Cartao cartao = cartaoResponse.toCartao();
                 tx.executeWithoutResult(status -> {
@@ -53,6 +58,10 @@ public class BuscarCartaoPropostaElegivel {
                 logger.info("Falha ao buscar cartão da proposta de id " + proposta.getId());
             }
         }
+    }
+
+    private void logarTentativaOpenTracing(String idProposta) {
+        tracer.activeSpan().log("Buscando cartão da proposta de id " + idProposta);
     }
 
 }
