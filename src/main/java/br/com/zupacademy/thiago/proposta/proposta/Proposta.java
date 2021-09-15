@@ -3,10 +3,7 @@ package br.com.zupacademy.thiago.proposta.proposta;
 import br.com.zupacademy.thiago.proposta.feing.analise.AnaliseRequest;
 import br.com.zupacademy.thiago.proposta.cartao.CartaoResponse;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -16,7 +13,10 @@ public class Proposta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Convert(converter = AttributeEncryptor.class)
     private String documento;
+
     private String email;
     private String nome;
     private String endereco;

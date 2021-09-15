@@ -61,7 +61,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: Pa55w0rd
       POSTGRES_PORT_5432_TCP_ADDR: 127.0.0.1
-      KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
+#      KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
     restart: on-failure
 
   analise:
@@ -151,27 +151,28 @@ services:
     ports:
       - "7766:8080"
 
-  api-proposta:
-    build:
-      context: "./"
-      dockerfile: "Dockerfile"
-    image: thiagozupper/proposta
-    container_name: api-proposta
-    ports:
-      - "8080:8080"
-    environment:
-      PROPOSTA_DATABASE_URL: jdbc:mysql://mysql-proposta:3306/proposta
-      PROPOSTA_DATABASE_USERNAME: "root"
-      PROPOSTA_DATABASE_PASSWORD: "root"
-      SPRING_PROFILES_ACTIVE: "prod"
-      URL_API_ANALISE: http://analise:9999
-      URL_API_CONTAS: http://contas:8888
-      PROMETHEUS_ORIGIN: http://prometheus:9090
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/auth/realms/proposta
-      KEYCLOAK_JWKS_URI: http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
-    depends_on:
-      - mysql-proposta
+#  api-proposta:
+#    build:
+#      context: "./"
+#      dockerfile: "Dockerfile"
+#    image: thiagozupper/proposta
+#    container_name: api-proposta
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      PROPOSTA_DATABASE_URL: jdbc:mysql://mysql-proposta:3306/proposta
+#      PROPOSTA_DATABASE_USERNAME: "root"
+#      PROPOSTA_DATABASE_PASSWORD: "root"
+#      SPRING_PROFILES_ACTIVE: "prod"
+#      URL_API_ANALISE: http://analise:9999
+#      URL_API_CONTAS: http://contas:8888
+#      PROMETHEUS_ORIGIN: http://prometheus:9090
+#      KEYCLOAK_ISSUER_URI: http://keycloak:8080/auth/realms/proposta
+#      KEYCLOAK_JWKS_URI: http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs
+#      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+#      ATTRIBUTE_CONVERT_SECRET: EyJ1kfw1PbkXW73e7x3hXFVO
+#    depends_on:
+#      - mysql-proposta
 
 volumes:
   grafana-volume:
